@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"
+    >
+
+    <!-- iPhone / Add to Home Screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Sedona 2026">
+    <meta name="theme-color" content="#B85C38">
+
+    <title>Sedona 2026</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <style>
+        :root {
+            --sedona-rust: #B85C38;
+            --sedona-dark: #743B2A;
+            --sedona-sand: #F3E5CF;
+            --sedona-cream: #FFF9F0;
+            --sedona-sage: #78866B;
+            --sedona-gold: #D79B55;
+            --sedona-brown: #4A382D;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         Roboto, Helvetica, Arial, sans-serif;
+            background-color: #F7EFE3;
+            color: var(--sedona-brown);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .serif {
+            font-family: Georgia, "Times New Roman", serif;
+        }
+
+        .app-header {
+            min-height: 245px;
+            position: relative;
+            overflow: hidden;
+
+            background:
+                linear-gradient(
+                    to bottom,
+                    rgba(80, 32, 20, 0.15),
+                    rgba(80, 32, 20, 0.75)
+                ),
+                url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=85");
+
+            background-size: cover;
+            background-position: center;
+        }
+
+        .app-header::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 8px;
+
+            background: linear-gradient(
+                90deg,
+                var(--sedona-rust),
+                var(--sedona-gold),
+                var(--sedona-rust)
+            );
+        }
+
+        .card {
+            background: var(--sedona-cream);
+            border: 1px solid rgba(116, 59, 42, 0.12);
+            border-radius: 1.25rem;
+            box-shadow: 0 5px 18px rgba(74, 56, 45, 0.07);
+        }
+
+        .date-label {
+            display: inline-block;
+            background: var(--sedona-rust);
+            color: white;
+            padding: 0.28rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+        }
+
+        .badge-easy {
+            background: #DCE5D1;
+            color: #536348;
+        }
+
+        .badge-moderate {
+            background: #F1D5BC;
+            color: #934A2C;
+        }
+
+        .badge-photo {
+            background: #F7E0CF;
+            color: #9C5135;
+        }
+
+        .badge-food {
+            background: #E9DDD0;
+            color: #655044;
+        }
+
+        .btn-nav {
+            background: var(--sedona-sage);
+            color: white;
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.55rem 0.85rem;
+            border-radius: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-nav:active {
+            transform: scale(0.97);
+        }
+
+        .weather-card {
+            background:
+                linear-gradient(
+                    135deg,
+                    #FFF8EA,
+                    #F1D5B4
+                );
+        }
+
+        .sunset-card {
+            background:
+                linear-gradient(
+                    135deg,
+                    #F8D3A4,
+                    #E99962
+                );
+            color: #57301F;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 1.6rem;
+        }
+
+        .timeline::before {
+            content: "";
+            position: absolute;
+            left: 0.43rem;
+            top: 0.6rem;
+            bottom: 0.6rem;
+            border-left: 2px dotted var(--sedona-rust);
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -1.48rem;
+            top: 1.25rem;
+            width: 0.85rem;
+            height: 0.85rem;
+            border-radius: 50%;
+            background: #F7EFE3;
+            border: 3px solid var(--sedona-rust);
+        }
+
+        .fixed-event {
+            border-left: 5px solid var(--sedona-sage);
+        }
+
+        .tbd {
+            border: 2px dashed #C8AA8E;
+            background: rgba(255, 249, 240, 0.6);
+        }
+
+        .bottom-nav {
+            padding-bottom: calc(0.6rem + env(safe-area-inset-bottom));
+        }
+
+        .western-line {
+            width: 52px;
+            height: 3px;
+            background: var(--sedona-rust);
+            border-radius: 99px;
+        }
+    </style>
+</head>
+
+
+<body>
+
+<!-- ===================================================== -->
+<!-- HERO -->
+<!-- ===================================================== -->
+
+<header class="app-header flex items-end">
+    <div class="relative z-10 w-full px-6 pb-8 text-white">
+
+        <p class="text-[11px] font-bold tracking-[0.28em] uppercase mb-3">
+            Red Rocks · Good Vibes · Great Memories
+        </p>
+
+        <h1 class="serif text-5xl font-bold tracking-wide leading-none">
+            SEDONA
+        </h1>
+
+        <p class="text-sm tracking-[0.22em] mt-2">
+            ARIZONA ROAD TRIP
+        </p>
+
+        <div class="western-line bg-white/80 mt-5 mb-4"></div>
+
+        <p class="text-sm font-semibold">
+            OCT 9 — OCT 12, 2026
+        </p>
+
+        <p class="text-xs text-white/80 mt-1">
+            Phoenix · Sedona · Flagstaff
+        </p>
+    </div>
+</header>
+
+
+<main class="px-4 pt-6 pb-28 max-w-2xl mx-auto">
+
+
+<!-- ===================================================== -->
+<!-- TRIP OVERVIEW -->
+<!-- ===================================================== -->
+
+<section class="mb-8">
+
+    <div class="grid grid-cols-2 gap-3">
+
+        <div class="card p-4">
+            <div class="text-xs uppercase tracking-wider text-stone-500">
+                Travelers
+            </div>
+
+            <div class="font-bold text-lg mt-1">
+                <i class="fa-solid fa-user-group mr-1"></i>
+                2 Adults
+            </div>
+        </div>
+
+
+        <div class="card p-4">
+            <div class="text-xs uppercase tracking-wider text-stone-500">
+                Road Trip
+            </div>
+
+            <div class="font-bold text-lg mt-1">
+                <i class="fa-solid fa-car mr-1"></i>
+                Arizona
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- OCT 9 -->
+<!-- ===================================================== -->
+
+<section class="mb-10">
+
+    <div class="date-label">
+        10/09 FRI · ARRIVAL
+    </div>
+
+    <h2 class="serif text-2xl font-bold mt-3 mb-4">
+        Hello, Arizona 🌵
+    </h2>
+
+
+    <div class="card p-5 mb-3 fixed-event">
+
+        <div class="flex justify-between items-center mb-3">
+
+            <span class="text-xs font-mono font-bold">
+                8:40 PM
+            </span>
+
+            <span class="text-xs font-bold text-orange-700">
+                FLIGHT
+            </span>
+
+        </div>
+
+        <h3 class="text-xl font-bold">
+            SAN
+            <i class="fa-solid fa-plane mx-2 text-orange-600"></i>
+            PHX
+        </h3>
+
+        <p class="text-sm text-stone-500 mt-2">
+            San Diego → Phoenix
+        </p>
+
+        <p class="text-sm mt-1">
+            預計約 10:00 PM 抵達 Phoenix。
+        </p>
+
+    </div>
+
+
+    <div class="card p-5">
+
+        <div class="flex items-start gap-4">
+
+            <div class="text-2xl text-orange-700">
+                <i class="fa-solid fa-bed"></i>
+            </div>
+
+            <div class="flex-1">
+
+                <p class="text-xs font-bold text-stone-500 mb-1">
+                    TONIGHT'S STAY
+                </p>
+
+                <h3 class="font-bold text-lg">
+                    GreenTree Inn & Suites
+                </h3>
+
+                <p class="text-sm text-stone-500">
+                    Phoenix Sky Harbor
+                </p>
+
+                <a
+                    href="https://www.google.com/maps/search/?api=1&query=GreenTree+Inn+Suites+Phoenix+Sky+Harbor"
+                    target="_blank"
+                    class="btn-nav mt-4"
+                >
+                    <i class="fa-solid fa-location-dot"></i>
+                    導航至飯店
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- OCT 10 -->
+<!-- ===================================================== -->
+
+<section class="mb-10">
+
+    <div class="date-label">
+        10/10 SAT · SEDONA
+    </div>
+
+    <h2 class="serif text-3xl font-bold mt-3">
+        Red Rock Country
+    </h2>
+
+    <p class="text-sm text-stone-500 mt-1 mb-4">
+        Phoenix → Sedona → Flagstaff
+    </p>
+
+
+    <!-- WEATHER -->
+
+    <div class="grid grid-cols-2 gap-3 mb-5">
+
+        <div class="card weather-card p-4">
+
+            <div class="text-xs font-bold uppercase tracking-wide">
+                <i class="fa-solid fa-sun text-yellow-600 mr-1"></i>
+                Weather
+            </div>
+
+            <div class="font-bold mt-2">
+                Forecast Pending
+            </div>
+
+            <p class="text-[11px] mt-1 text-stone-600">
+                接近旅行日期更新 High / Low、降雨與風速。
+            </p>
+
+        </div>
+
+
+        <div class="card sunset-card p-4">
+
+            <div class="text-xs font-bold uppercase tracking-wide">
+                <i class="fa-solid fa-mountain-sun mr-1"></i>
+                Sunset
+            </div>
+
+            <div class="text-2xl font-black mt-1">
+                5:58 PM
+            </div>
+
+            <p class="text-[11px] mt-1">
+                Airport Mesa
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- TIMELINE -->
+
+    <div class="timeline space-y-3">
+
+
+        <!-- PHOENIX -->
+
+        <div class="relative card p-4">
+
+            <span class="timeline-dot"></span>
+
+            <div class="text-xs font-mono font-bold text-orange-700">
+                ~8:00 AM
+            </div>
+
+            <h3 class="font-bold text-lg mt-1">
+                <i class="fa-solid fa-car mr-2"></i>
+                Depart Phoenix
+            </h3>
+
+            <p class="text-sm text-stone-500 mt-1">
+                正式開始 Arizona road trip。
+            </p>
+
+        </div>
+
+
+
+        <!-- MONTEZUMA -->
+
+        <div class="relative card p-4">
+
+            <span class="timeline-dot"></span>
+
+            <div class="text-xs font-mono font-bold text-orange-700">
+                ~9:30 – 10:45 AM
+            </div>
+
+            <h3 class="font-bold text-lg mt-1">
+                Montezuma Castle
+            </h3>
+
+            <p class="text-sm text-stone-500 mt-1">
+                National Monument · Cliff Dwellings
+            </p>
+
+            <div class="flex gap-2 mt-3">
+
+                <span class="badge-easy text-xs px-2 py-1 rounded-full font-bold">
+                    Easy
+                </span>
+
+                <span class="badge-photo text-xs px-2 py-1 rounded-full font-bold">
+                    History
+                </span>
+
+            </div>
+
+            <a
+                href="https://www.google.com/maps/search/?api=1&query=Montezuma+Castle+National+Monument"
+                target="_blank"
+                class="btn-nav mt-4"
+            >
+                <i class="fa-solid fa-location-dot"></i>
+                Google Maps
+            </a>
+
+        </div>
+
+
+
+        <!-- CHAPEL -->
+
+        <div class="relative card p-4">
+
+            <span class="timeline-dot"></span>
+
+            <div class="text-xs font-mono font-bold text-orange-700">
+                ~11:30 AM – 12:30 PM
+            </div>
+
+            <h3 class="font-bold text-lg mt-1">
+                Chapel of the Holy Cross
+            </h3>
+
+            <p class="text-sm text-stone-500 mt-1">
+                Sedona 經典紅岩教堂。
+            </p>
+
+            <div class="mt-3">
+                <span class="badge-photo text-xs px-2 py-1 rounded-full font-bold">
+                    Iconic View
+                </span>
+            </div>
+
+            <a
+                href="https://www.google.com/maps/search/?api=1&query=Chapel+of+the+Holy+Cross+Sedona"
+                target="_blank"
+                class="btn-nav mt-4"
+            >
+                <i class="fa-solid fa-location-dot"></i>
+                Google Maps
+            </a>
+
+        </div>
+
+
+
+        <!-- TLAQUEPAQUE -->
+
+        <div class="relative card p-4">
+
+            <span class="timeline-dot"></span>
+
+            <div class="text-xs font-mono font-bold text-orange-700">
+                ~12:45 – 2:45 PM
+            </div>
+
+            <h3 class="font-bold text-lg mt-1">
+                Tlaquepaque Arts & Shopping Village
+            </h3>
+
+            <p class="text-sm text-stone-500 mt-1">
+                午餐 · Gallery · Shopping · 拍照
+            </p>
+
+            <div class="flex flex-wrap gap-2 mt-3">
+
+                <span class="badge-food text-xs px-2 py-1 rounded-full font-bold">
+                    Lunch
+                </span>
+
+                <span class="badge-photo text-xs px-2 py-1 rounded-full font-bold">
+                    Art
+                </span>
+
+                <span class="badge-photo text-xs px-2 py-1 rounded-full font-bold">
+                    Shopping
+                </span>
+
+            </div>
+
+            <a
+                href="https://www.google.com/maps/search/?api=1&query=Tlaquepaque+Arts+Shopping+Village+Sedona"
+                target="_blank"
+                class="btn-nav mt-4"
+            >
+                <i class="fa-solid fa-location-dot"></i>
+                Google Maps
+            </a>
+
+        </div>
+
+
+
+        <!-- SNOOPY -->
+
+        <div class="relative card p-4">
+
+            <span class="timeline-dot"></span>
+
+            <div class="text-xs font-mono font-bold text-orange-700">
+                ~3:00 PM
+            </div>
+
+            <h3 class="font-bold text-lg mt-1">
+                Snoopy Rock 🐶
+            </h3>
+
+            <p class="text-sm text-stone-500 mt-1">
+                找 Snoopy 仰躺在紅岩上的經典輪廓。
+            </p>
+
+            <div class="flex gap-2 mt-3">
+
+                <span class="badge-easy text-xs px-2 py-1 rounded-full font-bold">
+                    Easy
+                </span>
+
+                <span class="badge-photo text-xs px-2 py-1 rounded-full font-bold">
+                    Photo Stop
+                </span>
+
+            </div>
+
+            <a
+                href="https://www.google.com/maps/search/?api=1&query=Snoopy+Rock+Sedona"
+                target="_blank"
+                class="btn-nav mt-4"
+            >
+                <i class="fa-solid fa-location-dot"></i>
+                Google Maps
+            </a>
+
+        </div>
+
+
+
+        <!-- AIRPORT MESA -->
+
+        <div class="relative card sunset-card p-4">
+
+            <span class="timeline-dot"></span>
+
+            <div class="text-xs font-mono font-bold">
+                4:45 – 6:15 PM
+            </div>
+
+            <h3 class="font-bold text-xl mt-1">
+                Airport Mesa Sunset 🌅
+            </h3>
+
+            <p class="text-sm mt-2">
+                日落 5:58 PM。
+            </p>
+
+            <p class="text-xs mt-1">
+                建議 4:45–5:00 PM 抵達，日落後再留約 10–15 分鐘。
+            </p>
+
+            <a
+                href="https://www.google.com/maps/search/?api=1&query=Airport+Mesa+Sedona"
+                target="_blank"
+                class="btn-nav mt-4"
+            >
+                <i class="fa-solid fa-location-dot"></i>
+                Google Maps
+            </a>
+
+        </div>
+
+
+
+        <!-- FLAGSTAFF -->
+
+        <div class="relative card p-4">
+
+            <span class="timeline-dot"></span>
+
+            <div class="text-xs font-mono font-bold text-orange-700">
+                EVENING
+            </div>
+
+            <h3 class="font-bold text-lg mt-1">
+                <i class="fa-solid fa-bed mr-2"></i>
+                Highland Country Inn
+            </h3>
+
+            <p class="text-sm text-stone-500 mt-1">
+                Flagstaff · 10/10–10/12
+            </p>
+
+            <a
+                href="https://www.google.com/maps/search/?api=1&query=Highland+Country+Inn+Flagstaff"
+                target="_blank"
+                class="btn-nav mt-4"
+            >
+                <i class="fa-solid fa-location-dot"></i>
+                導航至飯店
+            </a>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- OCT 11 -->
+<!-- ===================================================== -->
+
+<section class="mb-10">
+
+    <div class="date-label">
+        10/11 SUN · HIKING DAY
+    </div>
+
+    <h2 class="serif text-3xl font-bold mt-3">
+        Hike & Wander
+    </h2>
+
+    <p class="text-sm text-stone-500 mt-1 mb-4">
+        Devil's Bridge + Easy Afternoon
+    </p>
+
+
+    <div class="grid grid-cols-2 gap-3 mb-5">
+
+        <div class="card weather-card p-4">
+
+            <div class="text-xs font-bold uppercase">
+                <i class="fa-solid fa-cloud-sun mr-1"></i>
+                Weather
+            </div>
+
+            <div class="font-bold mt-2">
+                Forecast Pending
+            </div>
+
+            <p class="text-[11px] mt-1">
+                Hiking day — 出發前確認降雨與風速。
+            </p>
+
+        </div>
+
+
+        <div class="card sunset-card p-4">
+
+            <div class="text-xs font-bold uppercase">
+                Sunset
+            </div>
+
+            <div class="text-2xl font-black mt-1">
+                5:57 PM
+            </div>
+
+            <p class="text-[11px] mt-1">
+                6 PM 已有晚餐
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="timeline space-y-3">
+
+
+        <!-- LEAVE -->
+
+        <div class="relative card p-4">
+
+            <span class="timeline-dot"></span>
+
+            <div class="text-xs font-mono font-bold text-orange-700">
+                ~6:00 AM
+            </div>
+
+            <h3 class="font-bold text-lg mt-1">
+                Leave Flagstaff
+            </h3>
+
+            <p class="text-sm text-stone-500 mt-1">
+                早點抵達 Sedona，避開 Devil's Bridge 人潮。
+            </p>
+
+        </div>
+
+
+
+        <!-- DEVILS BRIDGE -->
+
+        <div class="relative card p-4">
+
+            <span class="timeline-dot"></span>
+
+            <div class="text-xs font-mono font-bold text-orange-700">
+                MORNING · ~3–3.5 HR
+            </div>
+
+            <h3 class="font-bold text-xl mt-1">
+                Devil's Bridge 🥾
+            </h3>
+
+            <p class="text-sm text-stone-500 mt-2">
+                本趟主要 hike。最後一段較陡、有岩石階梯，
+                並預留橋上排隊拍照時間。
+            </p>
+
+            <div class="flex gap-2 mt-3">
+
+                <span class="badge-moderate text-xs px-2 py-1 rounded-full font-bold">
+                    Moderate
+                </span>
+
+                <span class="badge-photo text-xs px-2 py-1 rounded-full font-bold">
+                    Main Hike
+                </span>
+
+            </div>
+
+            <a
+                href="https://www.google.com/maps/search/?api=1&query=Devils+Bridge+Trail+Sedona"
+                target="_blank"
+                class="btn-nav mt-4"
+            >
+                <i class="fa-solid fa-location-dot"></i>
+                Google Maps
+            </a>
+
+        </div>
+
+
+
+        <!-- BLUE MCDONALDS -->
+
+        <div class="relative card p-4">
+
+            <span class="timeline-dot"></span>
+
+            <div class="text-xs font-mono font-bold text-orange-700">
+                ~11:15 AM
+            </div>
+
+            <h3 class="font-bold text-lg mt-1">
+                Blue McDonald's 💙
+            </h3>
+
+            <p class="text-sm text-stone-500 mt-1">
+                Sedona 著名 turquoise arches。
+            </p>
+
+            <p class="text-xs text-stone-500 mt-1">
+                2380 W State Route 89A
+            </p>
+
+            <div class="mt-3">
+                <span class="badge-photo text-xs px-2 py-1 rounded-full font-bold">
+                    Photo Stop
+                </span>
+            </div>
+
+            <a
+                href="https://www.google.com/maps/search/?api=1&query=McDonalds+2380+W+State+Route+89A+Sedona"
+                target="_blank"
+                class="btn-nav mt-4"
+            >
+                <i class="fa-solid fa-location-dot"></i>
+                Google Maps
+            </a>
+
+        </div>
+
+
+
+        <!-- LUNCH -->
+
+        <div class="relative card tbd p-4">
+
+            <span class="timeline-dot"></span>
+
+            <div class="text-xs font-mono font-bold text-orange-700">
+                ~12:00 PM
+            </div>
+
+            <h3 class="font-bold text-lg mt-1">
+                Lunch 🍴
+            </h3>
+
+            <p class="text-sm text-stone-500">
+                TBD
+            </p>
+
+            <p class="text-xs text-stone-500 mt-1">
+                晚上 6 PM 已有 Creekside，午餐建議吃輕一點。
+            </p>
+
+        </div>
+
+
+
+        <!-- STUPA -->
+
+        <div class="relative card p-4">
+
+            <span class="timeline-dot"></span>
+
+            <div class="text-xs font-mono font-bold text-orange-700">
+                ~1:15 – 2:00 PM
+            </div>
+
+            <h3 class="font-bold text-lg mt-1">
+                Amitabha Stupa & Peace Park ☸️
+            </h3>
+
+            <p class="text-sm text-stone-500 mt-1">
+                安靜、簡單的紅岩散步。
+            </p>
+
+            <div class="mt-3">
+                <span class="badge-easy text-xs px-2 py-1 rounded-full font-bold">
+                    Easy
+                </span>
+            </div>
+
+            <a
+                href="https://www.google.com/maps/search/?api=1&query=Amitabha+Stupa+Peace+Park+Sedona"
+                target="_blank"
+                class="btn-nav mt-4"
+            >
+                <i class="fa-solid fa-location-dot"></i>
+                Google Maps
+            </a>
+
+        </div>
+
+
+
+        <!-- RED ROCK CROSSING -->
+
+        <div class="relative card p-4">
+
+            <span class="timeline-dot"></span>
+
+            <div class="text-xs font-mono font-bold text-orange-700">
+                ~2:15 – 4:00 PM
+            </div>
+
+            <h3 class="font-bold text-lg mt-1">
+                Red Rock Crossing 🌊
+            </h3>
+
+            <p class="text-sm text-stone-500 mt-1">
+                Oak Creek + Cathedral Rock 經典景色。
+            </p>
+
+            <p class="text-xs text-stone-500 mt-1">
+                Devil's Bridge 後改成舒服散步。
+            </p>
+
+            <div class="flex gap-2 mt-3">
+
+                <span class="badge-easy text-xs px-2 py-1 rounded-full font-bold">
+                    Easy
+                </span>
+
+                <span class="badge-photo text-xs px-2 py-1 rounded-full font-bold">
+                    Photography
+                </span>
+
+            </div>
+
+            <a
+                href="https://www.google.com/maps/search/?api=1&query=Crescent+Moon+Picnic+Site+Sedona"
+                target="_blank"
+                class="btn-nav mt-4"
+            >
+                <i class="fa-solid fa-location-dot"></i>
+                Google Maps
+            </a>
+
+        </div>
+
+
+
+        <!-- RESET -->
+
+        <div class="relative card p-4">
+
+            <span class="timeline-dot"></span>
+
+            <div class="text-xs font-mono font-bold text-orange-700">
+                4:15 – 5:15 PM
+            </div>
+
+            <h3 class="font-bold text-lg mt-1">
+                Coffee & Reset ☕
+            </h3>
+
+            <p class="text-sm text-stone-500">
+                休息、咖啡、換衣服、補妝。
+            </p>
+
+            <p class="text-xs text-stone-500 mt-1">
+                同時作為 Devil's Bridge 延誤的 buffer。
+            </p>
+
+        </div>
+
+
+
+        <!-- DINNER -->
+
+        <div class="relative card fixed-event p-4">
+
+            <span class="timeline-dot"></span>
+
+            <div class="flex justify-between items-center">
+
+                <div class="text-xs font-mono font-bold text-orange-700">
+                    6:00 PM
+                </div>
+
+                <span class="text-[10px] bg-green-700 text-white
+                             px-2 py-1 rounded-full font-bold">
+                    RESERVED
+                </span>
+
+            </div>
+
+            <h3 class="font-bold text-xl mt-2">
+                Creekside American Bistro 🍽️
+            </h3>
+
+            <p class="text-sm text-stone-500 mt-1">
+                Dinner reservation
+            </p>
+
+            <a
+                href="https://www.google.com/maps/search/?api=1&query=Creekside+American+Bistro+Sedona"
+                target="_blank"
+                class="btn-nav mt-4"
+            >
+                <i class="fa-solid fa-location-dot"></i>
+                導航至餐廳
+            </a>
+
+        </div>
+
+
+        <!-- RETURN -->
+
+        <div class="relative card p-4">
+
+            <span class="timeline-dot"></span>
+
+            <div class="text-xs font-mono font-bold text-orange-700">
+                AFTER DINNER
+            </div>
+
+            <h3 class="font-bold text-lg mt-1">
+                Return to Flagstaff 🌲
+            </h3>
+
+            <p class="text-sm text-stone-500">
+                Highland Country Inn
+            </p>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- OCT 12 -->
+<!-- ===================================================== -->
+
+<section class="mb-10">
+
+    <div class="date-label">
+        10/12 MON · DEPARTURE
+    </div>
+
+    <h2 class="serif text-3xl font-bold mt-3">
+        One More Adventure
+    </h2>
+
+    <p class="text-sm text-stone-500 mt-1 mb-4">
+        Flagstaff → Phoenix
+    </p>
+
+
+
+    <div class="card p-5 mb-3">
+
+        <div class="text-xs font-mono font-bold text-orange-700">
+            MORNING
+        </div>
+
+        <h3 class="font-bold text-lg mt-1">
+            <i class="fa-solid fa-suitcase mr-2"></i>
+            Check Out
+        </h3>
+
+        <p class="text-sm text-stone-500 mt-1">
+            Highland Country Inn
+        </p>
+
+    </div>
+
+
+
+    <!-- intentionally blank -->
+
+    <div class="card tbd p-8 mb-3 text-center">
+
+        <div class="text-3xl mb-3">
+            🌵
+        </div>
+
+        <h3 class="serif font-bold text-xl">
+            Day 3 Adventure
+        </h3>
+
+        <p class="text-sm text-stone-500 mt-2">
+            行程暫時保留空白
+        </p>
+
+        <p class="text-xs text-stone-400 mt-1">
+            Verde Canyon Railroad 等選項之後再決定
+        </p>
+
+    </div>
+
+
+
+    <div class="card fixed-event p-5">
+
+        <div class="flex justify-between items-center">
+
+            <span class="text-xs font-mono font-bold text-orange-700">
+                5:55 PM
+            </span>
+
+            <span class="text-[10px] bg-red-700 text-white
+                         px-2 py-1 rounded-full font-bold">
+                FIXED
+            </span>
+
+        </div>
+
+        <h3 class="font-bold text-xl mt-2">
+            PHX
+            <i class="fa-solid fa-plane-departure mx-2 text-orange-600"></i>
+            Home
+        </h3>
+
+        <p class="text-sm text-stone-500 mt-2">
+            Phoenix 回程班機
+        </p>
+
+        <p class="text-xs text-stone-500 mt-2">
+            第三天確定行程後，再倒推開車、還車、
+            行李與機場安檢時間。
+        </p>
+
+    </div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- TRIP NOTES -->
+<!-- ===================================================== -->
+
+<section class="mb-4">
+
+    <div class="card p-5">
+
+        <h3 class="serif text-xl font-bold mb-4">
+            Desert Notes 🌵
+        </h3>
+
+        <div class="space-y-3 text-sm">
+
+            <div class="flex gap-3">
+                <i class="fa-solid fa-droplet text-blue-600 mt-1"></i>
+                <span>Devil's Bridge 記得帶足夠的水。</span>
+            </div>
+
+            <div class="flex gap-3">
+                <i class="fa-solid fa-sun text-yellow-600 mt-1"></i>
+                <span>Sedona 日照強，建議防曬＋帽子。</span>
+            </div>
+
+            <div class="flex gap-3">
+                <i class="fa-solid fa-shirt text-orange-700 mt-1"></i>
+                <span>Flagstaff 晚上比 Sedona 冷，車上留外套。</span>
+            </div>
+
+            <div class="flex gap-3">
+                <i class="fa-solid fa-camera text-stone-600 mt-1"></i>
+                <span>Airport Mesa、Red Rock Crossing 都適合拍照。</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+
+<!-- ===================================================== -->
+<!-- BOTTOM APP NAV -->
+<!-- ===================================================== -->
+
+<nav
+    class="bottom-nav fixed bottom-0 left-0 right-0
+           bg-[#FFF9F0]/95 backdrop-blur-xl
+           border-t border-orange-900/10
+           z-50"
+>
+
+    <div class="max-w-2xl mx-auto grid grid-cols-4">
+
+        <a
+            href="#"
+            class="text-center py-3 text-orange-700 no-underline"
+        >
+            <i class="fa-solid fa-compass text-xl block mb-1"></i>
+            <span class="text-[10px] font-bold">
+                Explore
+            </span>
+        </a>
+
+
+        <a
+            href="https://www.google.com/maps/search/Sedona+Arizona"
+            target="_blank"
+            class="text-center py-3 text-stone-600 no-underline"
+        >
+            <i class="fa-solid fa-map text-xl block mb-1"></i>
+            <span class="text-[10px] font-bold">
+                Map
+            </span>
+        </a>
+
+
+        <a
+            href="#"
+            class="text-center py-3 text-stone-600 no-underline"
+        >
+            <i class="fa-solid fa-person-hiking text-xl block mb-1"></i>
+            <span class="text-[10px] font-bold">
+                Trails
+            </span>
+        </a>
+
+
+        <a
+            href="#"
+            class="text-center py-3 text-stone-600 no-underline"
+        >
+            <i class="fa-solid fa-heart text-xl block mb-1"></i>
+            <span class="text-[10px] font-bold">
+                Memories
+            </span>
+        </a>
+
+    </div>
+
+</nav>
+
+
+</body>
+</html>
